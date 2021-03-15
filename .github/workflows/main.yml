@@ -1,0 +1,22 @@
+on: [push]
+
+jobs:
+  pandoc-job:
+    runs-on: ubuntu-latest
+    name: a job to pandoc
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: pandoc action step
+        uses: Amusac/markdown-to-pdf-ja@main
+        with:
+          DEFAULT_FILE: "report" # default file of pandoc, not input markdown file
+      - name: push pdf to github repository
+        run: |
+          git config --global user.name 'markdown-to-pdf-ja'
+          git config --global user.email 'Amusac@users.noreply.github.com'
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/$GITHUB_REPOSITORY
+          git checkout $GITHUB_HEAD_REF
+          git add main.pdf
+          git commit -am "push PDF"
+          git push
